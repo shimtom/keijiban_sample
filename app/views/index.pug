@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  nav(class="navbar navbar-default navbar-fixed-top")
+    .container-fluid
+      .navbar-header
+        a(class="navbar-brand" href="/") Bulletin Board
+
+      ul(class="nav navbar-nav navbar-right")
+        li
+          form(class="navbar-form" role="search")
+            .form-group
+              input(type="text" class="form-control" placeholder="Search")
+              button(type="button" class="btn btn-default")
+                span(class="glyphicon glyphicon-search" aria-hidden="false")
+
+  .container-fluid
+    h1= title
+    div(id="comments")
+      div(class="panel panel-default comment-panel")
+        .panel-heading 1. name time
+        .panel-body Panel content
+
+      div(class="panel panel-default comment-panel")
+        .panel-heading 1. name time
+        .panel-body Panel content
+
+    form(id="comment-form")
+      textarea(class="form-control" rows="3")
+      button(type="button" class="btn btn-default") comment
+
+  script(type='text/javascript' src='/javascripts/scripts.js')
