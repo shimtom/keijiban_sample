@@ -1,4 +1,3 @@
-// @flow
 // 必要なパッケージの読み込み
 var mysql = require('mysql')
 var express = require('express');
