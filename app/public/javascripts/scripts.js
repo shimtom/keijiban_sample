@@ -1,4 +1,4 @@
-var host = "http://localhost";
+var host = "http://db";
 var user = "admin";
 var board_id = 1;
 
