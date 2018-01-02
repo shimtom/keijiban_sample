@@ -2,20 +2,29 @@ version: "3"
 services:
   db:
     build: ./db
+    container_name: db
     environment:
       - MYSQL_ROOT_PASSWORD=root
+    expose:
+      - 3306
     volumes:
       - "./var/lib/mysql:/var/lib/mysql"
+    networks:
+      - keijiban
     restart: always
 
   app:
     build: ./app
+    container_name: app
     depends_on:
       - db
     ports:
       - "80:3000"
     volumes:
       - /src/node_modules
-    links:
-      - db
+    networks:
+      - keijiban
     restart: always
+
+networks:
+  keijiban:
