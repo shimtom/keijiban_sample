@@ -42,7 +42,7 @@ module.exports = function(connection) {
     var query = "SELECT * FROM boards JOIN users ON boards.creator_name = users.name"
     connection.query(query, function(error, results, fields) {
       if (error) {
-        res.status(500).json(error.sqlMessage, "boards", error.code);
+        res.status(500).json(sql_error(error.sqlMessage, "boards", error.code));
         return;
       }
 
@@ -72,7 +72,7 @@ module.exports = function(connection) {
     var query = "SELECT name, display_name FROM users WHERE name = ?";
     connection.query(query, [username], function(error, results, fields) {
       if (error) {
-        res.status(500).json(error.sqlMessage, "boards", error.code);
+        res.status(500).json(sql_error(error.sqlMessage, "boards", error.code));
         return;
       }
       if (results.length > 1) {
@@ -93,18 +93,17 @@ module.exports = function(connection) {
     var query = "INSERT INTO boards (title, creator_name) VALUES (?, ?)"
     connection.query(query, [title, username], function(error, results, fields) {
       if (error) {
-        res.status(500).json(error.sqlMessage, "boards", error.code);
+        res.status(500).json(sql_error(error.sqlMessage, "boards", error.code));
         return;
       }
 
       var board_id = results.insertId
-      console.log(board_id);
       // board_id を次のミドルウェアに渡す方法が不明なためこの場でdbに接続
       // board_idを持つボードを取得
       query = "SELECT * FROM boards JOIN users ON boards.creator_name = users.name WHERE boards.id = ?";
       connection.query(query, [board_id], function(error, results, fields) {
         if (error) {
-          res.status(500).json(error.sqlMessage, "boards", error.code);
+          res.status(500).json(sql_error(error.sqlMessage, "boards", error.code));
           return;
         }
         if (results.length != 1) {
@@ -185,7 +184,7 @@ module.exports = function(connection) {
     var board_id = req.params.board_id;
 
     // 指定されたボードのコメントを全て取得.
-    query = "SELECT * FROM comments JOIN users ON comments.creator_name = users.name WHERE comments.board_id = ?";
+    var query = "SELECT * FROM comments JOIN users ON comments.creator_name = users.name WHERE comments.board_id = ?";
     connection.query(query, [board_id], function(error, results, fields) {
       if (error) {
         res.status(500).json(sql_error(error.sqlMessage, "boards/" + board_id + "/comments", error.code));
