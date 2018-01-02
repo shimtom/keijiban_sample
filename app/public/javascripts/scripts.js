@@ -1,4 +1,4 @@
-var host = "http://localhost";
+var host = "http://127.0.0.1:3000";
 var user = "admin";
 var board_id = 1;
 
@@ -8,7 +8,6 @@ function render_comments(){
   console.log("rendoer comments");
   $.getJSON(host + "/api/boards/" + board_id + "/comments", function(res){
     console.log("render comments");
-
     comments.empty();
     res.forEach(function(value, index) {
       var created_at = value.created_at;

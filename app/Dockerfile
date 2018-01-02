@@ -10,6 +10,6 @@ COPY . /src
 ENV BASIC_AUTH_USERNAME user
 ENV BASIC_AUTH_PASSWORD password
 
-EXPOSE 3000
+EXPOSE 8080
 
 CMD ["npm", "start"]
