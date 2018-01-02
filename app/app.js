@@ -10,7 +10,6 @@ var mysql = require('mysql');
 var basicAuth = require('basic-auth-connect');
 
 // 分割したファイルを読み込み
-var index = require('./routes/index');
 var users = require('./routes/users');
 var boards = require('./routes/boards');
 
@@ -38,7 +37,7 @@ function main(){
     // basic 認証
     var username = process.env.BASIC_AUTH_USERNAME || "user";
     var password = process.env.BASIC_AUTH_PASSWORD || "password";
-    app.use(basicAuth(username, password));
+    // app.use(basicAuth(username, password));
 
     // view engine setup
     app.set('views', path.join(__dirname, 'views'));
@@ -48,10 +47,13 @@ function main(){
     app.use(bodyParser.urlencoded({ extended: false}));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
+    app.use((req, res, next) => {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      next();
+    });
 
     // app.use('/login', login(connection));
-    app.use('/', index);
-    app.use('/app/', index);
     app.use('/api/', users(connection));
     app.use('/api/', boards(connection));
 
