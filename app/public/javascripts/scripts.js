@@ -5,7 +5,7 @@ var board_id = 1;
 // コメントを取得し,描画する.
 function render_comments(){
   var comments = $("#comments");
-  console.log("rendoer ");
+  console.log("rendoer comments");
   $.getJSON(host + "/api/boards/" + board_id + "/comments", function(res){
     console.log("render comments");
 
@@ -40,10 +40,12 @@ function render_comments(){
 // コメントをポストする.
 function post_comment(){
   $('#comment-form button').on('click', function() {
+    console.log('post comment');
     // comment form の値を取得
     var textarea = $("#comment-form textarea");
     var content = textarea.val();
     if (content.length == 0) {
+      console.log('no comments.')
       return;
     }
     textarea.val("");
@@ -51,6 +53,7 @@ function post_comment(){
       "content": content,
       "username": user
     };
+    console.log('comment:', comment);
     $.post(host + "/api/boards/"+ board_id +"/comments", comment,function(res) {
       render_comments();
     });
