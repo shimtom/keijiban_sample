@@ -13,18 +13,37 @@ services:
       - keijiban
     restart: always
 
+  rest:
+    build: ./rest
+    container_name: rest
+    depends_on:
+      - db
+    expose:
+      - 3000
+    volumes:
+      - /src/node_modules
+    networks:
+      - keijiban
+    ports:
+      - 3000:3000
+    restart: always
+
   app:
     build: ./app
     container_name: app
     depends_on:
       - db
-    ports:
-      - "80:3000"
-    volumes:
-      - /src/node_modules
+      - rest
+    environment:
+      - BASIC_AUTH_USERNAME=user
+      - BASIC_AUTH_PASSWORD=password
     networks:
       - keijiban
+    ports:
+      - '80:8080'
     restart: always
+    volumes:
+      - /src/node_modules
 
 networks:
   keijiban:
