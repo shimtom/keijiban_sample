@@ -1,4 +1,3 @@
-// @flow
 // 必要なパッケージの読み込み
 var express = require('express');
 var path = require('path');
@@ -7,7 +6,8 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var mysql = require('mysql');
-var basicAuth = require('basic-auth-connect');
+var session = require('express-session');
+var MySQLStore = require('express-mysql-session')(session);
 
 // 分割したファイルを読み込み
 var users = require('./routes/users');
@@ -15,56 +15,69 @@ var boards = require('./routes/boards');
 
 var app = express();
 
-function main(){
-  var pool = mysql.createPool({
-    connectionLimit : 10,
+function checkSession(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+}
+
+function main() {
+  var options = {
+    connectionLimit: 10,
     host: 'db',
     user: 'root',
     password: 'root',
     database: 'bulletin_board',
-    debug:  false
+    debug: false
+  };
 
-  });
-  pool.getConnection(function(error, connection){
+  var pool = mysql.createPool(options);
+
+  pool.getConnection(function (error, connection) {
     if (error) {
       console.error("cannot connect mysql db.");
       console.error(error);
       process.exit(1);
     }
     console.log('mysql connected!');
-    console.log('start rest api server.');
-
-    // basic 認証
-    var username = process.env.BASIC_AUTH_USERNAME || "user";
-    var password = process.env.BASIC_AUTH_PASSWORD || "password";
-    // app.use(basicAuth(username, password));
 
     // view engine setup
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'pug');
 
     app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false}));
+    app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
-    app.use((req, res, next) => {
+    app.use(function (req, res, next) {
       res.header("Access-Control-Allow-Origin", "*");
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
       next();
     });
 
-    // app.use('/login', login(connection));
+    var sessionStore = new MySQLStore({}, connection);
+    app.use(session({
+      secret: 'keyboard cat',
+      store: sessionStore,
+      resave: false,
+      saveUninitialized: false
+    }));
+
+    app.use('/', login(connection));
+    app.use('/', checkSession, express.Router());
     app.use('/api/', users(connection));
     app.use('/api/', boards(connection));
 
     // Not Found エラーを設定し,エラーハンドラーへ渡す.
-    app.use(function(req, res, next) {
+    app.use(function (req, res, next) {
       var err = new Error('Not Found');
       err.status = 404;
       next(err);
     });
 
-    app.use(function(err, req, res, next) {
+    app.use(function (err, req, res, next) {
       // set locals, only providing error in development
       res.locals.message = err.message;
       res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -73,6 +86,8 @@ function main(){
       res.status(err.status || 500);
       res.render('error');
     });
+
+    console.log('start rest api server.');
   });
 }
 
