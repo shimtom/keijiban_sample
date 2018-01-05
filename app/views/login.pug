@@ -1,25 +1,31 @@
 extends layout
 
+
 block content
-    nav(class="navbar navbar-default navbar-fixed-top")
-        .container-fluid
-            .navbar-header
-                a(class="navbar-brand" href="/") Bulletin Board
+    include nav
+    .container
+        div(role='alert')#login-alert.alert.alert-danger.alert-dismissible.hidden
+            button(type='button' class='close' data-dismiss='alert' aria-label='Close')
+                span(aria-hidden='true') &times;
+            div(class='alert-text')
 
-            ul(class="nav navbar-nav navbar-right")
-                li
-                    form(class="navbar-form" role="search")
-                        .form-group
-                            input(type="text" class="form-control" placeholder="Search")
-                            button(type="button" class="btn btn-default")
-                                span(class="glyphicon glyphicon-search" aria-hidden="false")
-
-    .container-fluid
-        h1= title
-        div(id="comments")
-
-        form(id="comment-form")
-            textarea(class="form-control" rows="3")
-            button(type="button" class="btn btn-default") comment
+        .row
+            .col-sm-8.col-md-5.col-md-offset-3
+                //<div class="alert alert-danger" role="alert">...</div>
+                h2 Sign in
+                .panel.panel-default
+                    .panel-body
+                        form
+                            .form-group.form-group-lg
+                                label(for="login_field" class="control-label") Username
+                                input(type="text" class="form-control input-lg" id="login_field" placeholder="username")
+                            .form-group
+                                label(for="password") Password
+                                input(type="password" class="form-control input-lg" id="password" placeholder="password")
+                            button(type="button" class="btn btn-primary btn-lg btn-block" id="signin") Sign in
+                .panel
+                    .panel-body
+                        p.text-center New to Keigiban?
+                            a(href="/")  Create an account.
 
     script(type='text/javascript' src='/javascripts/scripts.js')
