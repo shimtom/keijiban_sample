@@ -1,0 +1,14 @@
+extends layout
+
+block content
+    include nav
+
+    .container-fluid
+        h1= title
+        #comments
+        //div(id="comments")
+        form#comment-form
+            textarea(class="form-control" rows="3")
+            button(type="button" class="btn btn-default") comment
+
+    script(type='text/javascript' src='/javascripts/scripts.js')

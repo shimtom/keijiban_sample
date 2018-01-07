@@ -15,26 +15,26 @@ block content
 
                 div(role='tabpanel').tab-content
                     div(role='tabpanel').panel-body.tab-pane.active#signin-panel
-                        form
+                        form(action='/login' method='post')
                             .form-group.form-group-lg
                                 label(for="login_field" class="control-label") Username
-                                input(type="text" class="form-control input-lg" id="login_field" placeholder="username")
+                                input(type="text" class="form-control input-lg" id="login_field" placeholder="username" name='username')
                             .form-group
                                 label(for="password") Password
-                                input(type="password" class="form-control input-lg" id="password" placeholder="password")
-                            button(type="button" class="btn btn-primary btn-lg btn-block" id="signin") Sign in
+                                input(type="password" class="form-control input-lg" id="password" placeholder="password" name='password')
+                            button(type="submit" class="btn btn-primary btn-lg btn-block" id="signin") Sign in
 
                     div(role='tabpanel').panel-body.tab-pane#signup-panel
-                        form
+                        form(action='/api/users' method='post')
                             .form-group.form-group-lg
                                 label(for="inputUsername" class="control-label") Username
-                                input(type="text" class="form-control input-lg" id="inputUsername" placeholder="username")
+                                input(type="text" class="form-control input-lg" id="inputUsername" placeholder="username" name='username')
                             .form-group.form-group-lg
                                 label(for="inputDisplayname" class="control-label") Displayname
-                                input(type="text" class="form-control input-lg" id="inputDisplayname" placeholder="displayname")
+                                input(type="text" class="form-control input-lg" id="inputDisplayname" placeholder="displayname" name='display_name')
                             .form-group
                                 label(for="inputPassword") Password
-                                input(type="password" class="form-control input-lg" id="inputPassword" placeholder="password")
+                                input(type="password" class="form-control input-lg" id="inputPassword" placeholder="password", name='password')
                             button(type="button" class="btn btn-primary btn-lg btn-block" id="signup") Sign up
 
 
