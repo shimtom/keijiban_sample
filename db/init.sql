@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- admin userを追加
 INSERT INTO users (name, display_name, password) VALUES ("admin", "Administrator", "YWRtaW4=");
+INSERT INTO users (name, display_name, password) VALUES ("test", "TestUser", "test");
 
 -- boards tabel 作成
 CREATE TABLE IF NOT EXISTS bulletin_board.boards (
