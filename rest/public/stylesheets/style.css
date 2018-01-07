@@ -1,8 +1,14 @@
 body {
-  padding: 50px;
+  padding: 70px 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+#sign .tab-content {
+  border: solid 1px #ddd;
+  border-top: none;
+  border-radius: 0 4px;
 }
