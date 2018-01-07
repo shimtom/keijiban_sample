@@ -11,19 +11,25 @@ function signin() {
     return;
   }
 
-  var req = {
+  var data = {
     'username': username,
     'password': password
   };
 
-  $.post(host + '/login', req)
-    .done(function (res) {
+
+  $.ajax(host + '/login', {
+    type: 'POST',
+    crossDomain: true,
+    data: data
+  })
+    .done(function (res, textStatus, jqXHR) {
       console.log('login response');
-      console.log(res);
-      console.log(e);
       if (res.username === username && res.status === 'login') {
         console.log('認証成功');
-        location.replace(location.origin);
+        console.log(res);
+        console.log(textStatus);
+        console.log(jqXHR);
+        // location.replace(location.origin);
         console.log(location)
       }
     })
@@ -53,7 +59,7 @@ function signup() {
     'password': password
   };
 
-  $.post(host + '/users', req)
+  $.post(host + '/api/users', req)
     .done(function (res) {
       console.log(res);
       console.log('登録成功');
@@ -84,35 +90,41 @@ function init() {
 function render_comments() {
   var comments = $("#comments");
   console.log("rendoer comments");
-  $.getJSON(host + "/api/boards/" + board_id + "/comments", function (res) {
-    console.log("render comments");
-    comments.empty();
-    res.forEach(function (value, index) {
-      var created_at = value.created_at;
-      var content = value.content;
 
-      var header = $("<div>", {
-        "class": "panel-heading",
-        "text": (index + 1) + ". 匿名: " + created_at
+  $.ajax(host + '/api/boards/' + board_id + '/comments', {
+    type: 'GET',
+    crossDomain: true
+  })
+    .done(function (res) {
+      console.log("render comments");
+      comments.empty();
+      res.forEach(function (value, index) {
+        var created_at = value.created_at;
+        var content = value.content;
+
+        var header = $("<div>", {
+          "class": "panel-heading",
+          "text": (index + 1) + ". 匿名: " + created_at
+        });
+
+        var body = $("<div>", {
+          "class": "panel-body",
+          "text": content
+        });
+
+        var panel = $("<div>", {
+          "class": "panel panel-default comment-panel"
+        });
+
+        panel.append(header);
+        panel.append(body);
+
+        comments.append(panel);
       });
 
-      var body = $("<div>", {
-        "class": "panel-body",
-        "text": content
-      });
-
-      var panel = $("<div>", {
-        "class": "panel panel-default comment-panel"
-      });
-
-      panel.append(header);
-      panel.append(body);
-
-      comments.append(panel);
     });
-
-  });
 }
+
 
 // コメントをポストする.
 function post_comment() {
