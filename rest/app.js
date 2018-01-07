@@ -1,43 +1,38 @@
 // 必要なパッケージの読み込み
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var mysql = require('mysql');
-var session = require('express-session');
-var MySQLStore = require('express-mysql-session')(session);
+let express = require('express');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let bodyParser = require('body-parser');
+let mysql = require('mysql');
+let session = require('express-session');
+let MySQLStore = require('express-mysql-session')(session);
+let passport = require('passport');
+let flash = require('connect-flash');
 
 // 分割したファイルを読み込み
-var users = require('./routes/users');
-var boards = require('./routes/boards');
+let users = require('./routes/users');
+let boards = require('./routes/boards');
+let login = require('./routes/login');
 
-var app = express();
+let index = require('./routes/index');
 
-function checkSession(req, res, next) {
-  if (req.session.user) {
-    next();
-  } else {
-    res.redirect('/login');
-  }
-}
+let app = express();
+
 
 function main() {
-  var options = {
+  // mysql setting
+  let options = {g
     connectionLimit: 10,
-    host: 'db',
-    user: 'root',
-    password: 'root',
-    database: 'bulletin_board',
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_ROOT_USER || 'root',
+    password: process.env.DB_ROOT_PASSWORD || 'root',
+    database: process.env.DB_NAME || 'bulletin_board',
     debug: false
   };
-
-  var pool = mysql.createPool(options);
-
+  let pool = mysql.createPool(options);
   pool.getConnection(function (error, connection) {
     if (error) {
-      console.error("cannot connect mysql db.");
+      console.error('cannot connect mysql db.');
       console.error(error);
       process.exit(1);
     }
@@ -47,37 +42,62 @@ function main() {
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'pug');
 
+    // express setting
+    app.use(flash());
+    let sessionStore = new MySQLStore({
+      schema: {
+        tableName: 'sessions',
+        columnNames: {
+          session_id: 'session_id',
+          expires: 'expires',
+          data: 'data'
+        }
+      }
+    }, connection);
+    app.use(session({
+      secret: 'keyboard cat',
+      store: sessionStore,
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: false
+      }
+    }));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, 'public')));
     app.use(function (req, res, next) {
-      res.header("Access-Control-Allow-Origin", "*");
-      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-      next();
+      res.header('Access-Control-Allow-Origin', '*');
+      res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+      // res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+
+      // intercept OPTIONS method
+      if ('OPTIONS' === req.method) {
+        res.send(200);
+      }
+      else {
+        next();
+      }
     });
+    app.use(passport.initialize());
+    app.use(passport.session());
 
-    var sessionStore = new MySQLStore({}, connection);
-    app.use(session({
-      secret: 'keyboard cat',
-      store: sessionStore,
-      resave: false,
-      saveUninitialized: false
-    }));
-
+    // routing
+    app.use('/', index);
     app.use('/', login(connection));
-    app.use('/', checkSession, express.Router());
     app.use('/api/', users(connection));
     app.use('/api/', boards(connection));
 
-    // Not Found エラーを設定し,エラーハンドラーへ渡す.
+    // error handler setting
     app.use(function (req, res, next) {
-      var err = new Error('Not Found');
+      let err = new Error('Not Found');
       err.status = 404;
       next(err);
     });
 
-    app.use(function (err, req, res, next) {
+    app.use(function (err, req, res) {
       // set locals, only providing error in development
       res.locals.message = err.message;
       res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -87,8 +107,9 @@ function main() {
       res.render('error');
     });
 
-    console.log('start rest api server.');
+    console.log('server launch');
   });
+
 }
 
 main();
