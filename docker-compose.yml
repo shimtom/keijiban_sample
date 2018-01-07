@@ -18,6 +18,11 @@ services:
     container_name: rest
     depends_on:
       - db
+    environment:
+      - DB_HOST=db
+      - DB_ROOT_USER=root
+      - DB_ROOT_PASSWORD=root
+      - DB_NAME=bulletin_board
     expose:
       - 3000
     networks:
