@@ -21,7 +21,7 @@ let app = express();
 
 function main() {
   // mysql setting
-  let options = {g
+  let options = {
     connectionLimit: 10,
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_ROOT_USER || 'root',
