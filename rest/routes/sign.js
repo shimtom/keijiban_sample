@@ -38,18 +38,19 @@ class User {
   }
 
   create(name, displayname, password, cb) {
+    const self = this;
     let query = "INSERT INTO users(name, display_name, password) VALUES (?, ?, ?)";
     this.connection.query(query, [name, displayname, password], function (error) {
       if (error) {
         switch (error.code) {
           case 'ER_DUP_ENTRY':
-            cb({'msg': 'duplicated username: ' + name});
+            cb({'msg': name + ' already exists.'});
             break;
           default:
             cb({'msg': error.sqlMessage});
         }
       } else {
-        this.findByName(name, cb);
+        self.findByName(name, cb);
       }
     });
   }
@@ -70,9 +71,12 @@ module.exports = function (connection) {
 
     userDB.findByName(user.name, function (error, user) {
       if (error) {
-        done(error);
-      } else {
+        done(null, false, error.msg);
+      }
+      if (user) {
         done(null, {'name': user.name});
+      } else {
+        done(null, false, 'incorrect username');
       }
     });
   });
@@ -83,30 +87,29 @@ module.exports = function (connection) {
 
     userDB.findByName(username, function (error, user) {
       if (error) {
-        done(error);
-      } else {
+        done(error.msg);
+      }
+      if (user && user.password === password) {
         done(null, {'name': user.name});
+      } else {
+        done(null, false, 'incorrect username or password');
       }
     });
 
   }));
 
   router.post('/login', passport.authenticate('local', {
+      successRedirect: '/',
       failureRedirect: '/',
       failureFlash: true
-    }), function (req, res) {
-      res.json({'username': req.body.username});
-      // res.redirect('/');
-    }
+    })
   );
 
   router.get('/logout', function (req, res) {
     console.log('logout');
     if (req.session && req.user) {
-      req.session.destroy();
-      res.json({
-        'username': req.user.name,
-      });
+      req.logout();
+      res.redirect('/');
     } else {
       req.flash('error', 'ログインしていません.');
       res.redirect('/');
@@ -114,26 +117,23 @@ module.exports = function (connection) {
   });
 
   // ユーザーの新規作成
-  router.post('/users', function (req, res) {
-    console.log('POST /users');
+  router.post('/api/users', function (req, res, next) {
+    console.log('POST /api/users');
     let username = req.body.username;
     let display_name = req.body.display_name;
     let password = req.body.password;
 
     userDB.create(username, display_name, password, function (error, user) {
-      if (error) {
-        res.status(400).json({
-          'message': error.msg,
-          'error': {
-            'resource': 'users'
-          }
-        });
-      } else {
-        res.status(201).json({
-          'username': user.name,
-          'display_name': user.display_name
-        });
+      if (error || user === undefined) {
+        req.flash('error', error.msg);
+        return res.redirect('/');
       }
+      req.login(user, function (err) {
+        if (err) {
+          return next(err);
+        }
+        res.redirect('/');
+      });
     });
   });
 
