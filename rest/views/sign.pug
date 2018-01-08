@@ -7,7 +7,7 @@ block content
         include alert
         .row
             .col-sm-8.col-md-5.col-md-offset-3#sign
-                ul.nav.nav-tabs#sign-tabs
+                ul.nav.nav-tabs.nav-justified#sign-tabs
                     li(role='presentation').active
                         a(href='#signin-panel' aria-controls='signin-panel' role='tab' data-toggle='tab') Sign in
                     li(role='presentation')
@@ -35,7 +35,7 @@ block content
                             .form-group
                                 label(for="inputPassword") Password
                                 input(type="password" class="form-control input-lg" id="inputPassword" placeholder="password", name='password')
-                            button(type="button" class="btn btn-primary btn-lg btn-block" id="signup") Sign up
+                            button(type="submit" class="btn btn-primary btn-lg btn-block" id="signup") Sign up
 
 
     script(type='text/javascript' src='/javascripts/scripts.js')
