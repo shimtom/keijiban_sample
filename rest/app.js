@@ -12,12 +12,42 @@ let flash = require('connect-flash');
 // 分割したファイルを読み込み
 let users = require('./routes/users');
 let boards = require('./routes/boards');
-let login = require('./routes/login');
+let sign = require('./routes/sign');
 
 let index = require('./routes/index');
 
 let app = express();
 
+
+function checkSession(req, res, next) {
+  console.log('Check session');
+  console.log('url', req.url);
+  let whitetList = [
+    {url: '/', method: 'GET'},
+    {url: '/login', method: 'POST'},
+    {url: '/logout', method: 'GET'},
+    {url: '/api/users', method: 'POST'}
+  ];
+  let allowed = whitetList.some(function (value) {
+    return value.url === req.url && value.method === req.method;
+  });
+  console.log('need authentication', !allowed);
+  console.log('check session', req.user !== undefined);
+  console.log('session id', req.sessionID);
+  console.log('request user', req.user);
+
+  if (allowed || req.user !== undefined) {
+    next();
+  } else {
+    res.status(401).json({
+      "message": "Unauthorized",
+      "error": {
+        "resource": req.url,
+        "code": '401'
+      }
+    });
+  }
+}
 
 function main() {
   // mysql setting
@@ -85,8 +115,9 @@ function main() {
     app.use(passport.session());
 
     // routing
+    app.use('/', checkSession);
     app.use('/', index);
-    app.use('/', login(connection));
+    app.use('/', sign(connection));
     app.use('/api/', users(connection));
     app.use('/api/', boards(connection));
 
