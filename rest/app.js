@@ -3,51 +3,20 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let bodyParser = require('body-parser');
+let logger = require('morgan');
 let mysql = require('mysql');
 let session = require('express-session');
 let MySQLStore = require('express-mysql-session')(session);
-let passport = require('passport');
 let flash = require('connect-flash');
+const authChecker = require('./middleware/auth');
 
 // 分割したファイルを読み込み
 let users = require('./routes/users');
 let boards = require('./routes/boards');
 let sign = require('./routes/sign');
-
 let index = require('./routes/index');
 
 let app = express();
-
-
-function checkSession(req, res, next) {
-  console.log('Check session');
-  console.log('url', req.url);
-  let whitetList = [
-    {url: '/', method: 'GET'},
-    {url: '/login', method: 'POST'},
-    {url: '/logout', method: 'GET'},
-    {url: '/api/users', method: 'POST'}
-  ];
-  let allowed = whitetList.some(function (value) {
-    return value.url === req.url && value.method === req.method;
-  });
-  console.log('need authentication', !allowed);
-  console.log('check session', req.user !== undefined);
-  console.log('session id', req.sessionID);
-  console.log('request user', req.user);
-
-  if (allowed || req.user !== undefined) {
-    next();
-  } else {
-    res.status(401).json({
-      "message": "Unauthorized",
-      "error": {
-        "resource": req.url,
-        "code": '401'
-      }
-    });
-  }
-}
 
 function main() {
   // mysql setting
@@ -60,10 +29,10 @@ function main() {
     debug: false
   };
   let pool = mysql.createPool(options);
-  pool.getConnection(function (error, connection) {
-    if (error) {
+  pool.getConnection(function (err, connection) {
+    if (err) {
       console.error('cannot connect mysql db.');
-      console.error(error);
+      console.error(err);
       process.exit(1);
     }
     console.log('mysql connected!');
@@ -73,6 +42,7 @@ function main() {
     app.set('view engine', 'pug');
 
     // express setting
+    app.use(logger('dev'));
     app.use(flash());
     let sessionStore = new MySQLStore({
       schema: {
@@ -111,31 +81,38 @@ function main() {
         next();
       }
     });
-    app.use(passport.initialize());
-    app.use(passport.session());
+
+    // auth setting
+    app.set('superSecret', 'secret');
 
     // routing
-    app.use('/', checkSession);
+    app.use('/', authChecker(connection).checkAuth([
+      {url: '/', method: 'GET'},
+      {url: '/login', method: 'POST'},
+      {url: '/api/users', method: 'POST'}
+    ]));
     app.use('/', index);
     app.use('/', sign(connection));
     app.use('/api/', users(connection));
     app.use('/api/', boards(connection));
 
-    // error handler setting
+
     app.use(function (req, res, next) {
       let err = new Error('Not Found');
       err.status = 404;
       next(err);
     });
 
-    app.use(function (err, req, res) {
-      // set locals, only providing error in development
-      res.locals.message = err.message;
-      res.locals.error = req.app.get('env') === 'development' ? err : {};
+    app.use(function (err, req, res, next) {
+      console.log(err.stack || 'Error :' + err.message);
 
-      // render the error page
-      res.status(err.status || 500);
-      res.render('error');
+      res.status(err.status || 500).json({
+        message: err.message,
+        error: {
+          resource: req.url,
+          code: err.code || err.status || 500
+        }
+      });
     });
 
     console.log('server launch');
