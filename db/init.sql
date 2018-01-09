@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS bulletin_board.boards (
 );
 
 -- anonymous board を追加
-INSERT INTO bulletin_board.boards (title, creator_name) VALUES ('匿名掲示板', 'admin');
+INSERT INTO bulletin_board.boards (title, creator_name) VALUES ('keijiban', 'admin');
 
 -- comments table 作成
 CREATE TABLE IF NOT EXISTS bulletin_board.comments (
