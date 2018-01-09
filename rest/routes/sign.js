@@ -13,11 +13,6 @@ module.exports = function (connection) {
     console.log('POST /login');
     let username = req.body.username;
     let password = req.body.password;
-    console.log('username', username);
-    console.log('password', password);
-    console.log('session', req.session);
-    console.log('session.user', req.session.user);
-    console.log('id', req.sessionID);
 
     if (!username && !password && req.headers['authorization']) {
       let token = req.headers['authorization'].match(/(\S+)\s+(\S+)/)[2];
