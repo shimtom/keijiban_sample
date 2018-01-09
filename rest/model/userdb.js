@@ -5,9 +5,9 @@ class UserDB {
 
   findAll(cb) {
     let query = "SELECT * FROM users";
-    this.connection.query(query, function (error, results) {
-      if (error) {
-        return cb({message: error.sqlMessage});
+    this.connection.query(query, function (err, results) {
+      if (err) {
+        return cb({message: err.sqlMessage});
       }
       let users = results.map(function (v) {
         let user = Object.assign({}, v);
@@ -20,9 +20,9 @@ class UserDB {
 
   findOneByName(name, cb) {
     let query = "SELECT * FROM users WHERE name = ?";
-    this.connection.query(query, [name], function (error, results) {
-      if (error) {
-        return cb({message: error.sqlMessage});
+    this.connection.query(query, [name], function (err, results) {
+      if (err) {
+        return cb({message: err.sqlMessage});
       }
       switch (results.length) {
         case 0:
@@ -42,9 +42,9 @@ class UserDB {
   updateStamp(name, cb) {
     const self = this;
     let query = "UPDATE users SET stamp = now() WHERE name = ?";
-    this.connection.query(query, [name], function (error, results) {
-      if (error) {
-        return cb({message: error.sqlMessage});
+    this.connection.query(query, [name], function (err, results) {
+      if (err) {
+        return cb({message: err.sqlMessage});
       }
       switch (results.changedRows) {
         case 1:

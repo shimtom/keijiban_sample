@@ -1,5 +1,5 @@
-let BoardDB = require('boarddb');
-let UserDB = require('userdb');
+let BoardDB = require('./boarddb');
+let UserDB = require('./userdb');
 
 class CommentDB {
   constructor(connection) {
@@ -15,38 +15,30 @@ class CommentDB {
         return cb(err);
       }
       let query = "SELECT * FROM comments JOIN users ON comments.creator_name = users.name WHERE comments.board_id = ?";
-      self.connection.query(query, [board_id], function (error, results) {
+      self.connection.query(query, [boardId], function (error, results) {
         if (error) {
-          return cb({'msg': error.sqlMessage, 'code': -1});
+          return cb({message: error.sqlMessage});
         }
-        console.log('get all comment', results);
         let comments = results.map(function (row) {
           return {
             "id": row.id,
             "board_id": row.board_id,
             "content": row.content,
-            "created_at": row.created_at,
-            "updated_at": row.updated_at,
             "creator": {
               "username": row.creator_name,
               "display_name": row.display_name
-            }
+            },
+            "created_at": row.created_at,
+            "updated_at": row.updated_at
           };
         });
-        let board = {
-          "id": results[0].id,
-          "title": results[0].title,
-          "creator": {
-            "username": results[0].creator_name,
-            "display_name": results[0].display_name
-          },
-          "comments": comments,
-          "created_at": results[0].created_at.toString(),
-          "updated_at": results[0].updated_at.toString()
-        };
-        console.log(board);
-
-        cb(null, comments);
+        self.boardDB.findOneById(boardId, function (err, board) {
+          if (err) {
+            return cb(err);
+          }
+          board.comments = comments;
+          cb(null, board);
+        });
       });
     });
   }
@@ -90,8 +82,13 @@ class CommentDB {
           if (error) {
             return cb(error);
           }
-          let comment_id = results.insertId;
-          self.findOneById(comment_id, cb);
+          self.boardDB.updateTimeStamp(boardId, function (err) {
+            if (err) {
+              return cb(err);
+            }
+            let comment_id = results.insertId;
+            self.findOneById(comment_id, cb);
+          });
         });
       });
     });
