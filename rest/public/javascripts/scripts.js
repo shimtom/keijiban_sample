@@ -2,82 +2,6 @@ var host = "http://127.0.0.1:3000";
 var user = "admin";
 var board_id = 1;
 
-function signin() {
-  var username = $('#login_field').val();
-  var password = $('#password').val();
-
-  if (username.length === 0 || password.length === 0) {
-    showAlert('username and password can\'t be blank');
-    return;
-  }
-
-  var data = {
-    'username': username,
-    'password': password
-  };
-
-
-  $.ajax(host + '/login', {
-    type: 'POST',
-    crossDomain: true,
-    data: data
-    // xhrFields: {
-    //   withCredentials: true
-    // }
-  })
-    .done(function (res, textStatus, jqXHR) {
-      console.log('login response');
-      console.log(res);
-      console.log(jqXHR);
-
-      $(document).html(res);
-      if (res.username === username && res.status === 'login') {
-        console.log('認証成功');
-        console.log(res);
-        console.log(textStatus);
-        console.log(jqXHR);
-        // location.replace(location.origin);
-        console.log(location)
-      }
-    })
-    .fail(function (jqXHR) {
-      var res = jqXHR.responseJSON || {};
-      var msg = res.message || 'sign in error';
-      showAlert(msg);
-    });
-
-}
-
-function signup() {
-  var username = $('#inputUsername').val();
-  var displayname = $('#inputDisplayname').val();
-  var password = $('#inputPassword').val();
-
-  if (username.length === 0 || password.length === 0) {
-    showAlert('username and password can\'t be blank');
-    return;
-  }
-
-  console.log('sign up ...');
-
-  var req = {
-    'username': username,
-    'display_name': displayname,
-    'password': password
-  };
-
-  $.post(host + '/api/users', req)
-    .done(function (res) {
-      console.log(res);
-      console.log('登録成功');
-      location.replace(location.origin);
-    })
-    .fail(function (jqXHR) {
-      var res = jqXHR.responseJSON || {};
-      var msg = res.message || 'sign up error';
-      showAlert(msg);
-    });
-}
 
 function init() {
   // init_alert();
@@ -91,6 +15,32 @@ function init() {
   //   signin();
   // });
 
+}
+
+function renderBoardList() {
+  let boardList = $('#board-list');
+  if (boardList) {
+    console.log('board list render');
+    $.ajax(host + '/api/boards', {
+      type: 'GET'
+    }).done(function (data) {
+      data.forEach(function (v, i) {
+        console.log(v);
+        let board = $("<tr>").addClass('board').attr({'scope': 'row', 'data-board-id':v.id});
+        let index = $("<th>").text(i + 1);
+        let title = $("<th>").text(v.title);
+        let creator = $("<td>").text(v.creator.display_name);
+        let createdTime = $("<td>").text(v.created_at);
+        let updatedTime = $("<td>").text(v.updated_at);
+        board.append(index, title, creator, createdTime, updatedTime);
+        board.on('click', function () {
+          let id = $(this).attr('data-board-id');
+          $.get(host + '/' + id);
+        });
+        boardList.append(board);
+      });
+    })
+  }
 }
 
 // コメントを取得し,描画する.
@@ -178,6 +128,7 @@ function showAlert(text) {
   }
 }
 
+renderBoardList();
 post_comment();
 render_comments();
 init();

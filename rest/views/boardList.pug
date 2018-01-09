@@ -1,0 +1,30 @@
+extends layout
+
+block content
+    include nav
+
+    .container-fluid
+        .row
+            .col-md-8
+                form(action='/api/boards' method='post').form-group.input-group
+                    input(placeholder='title').form-control.col-md-4
+                    span.input-group-btn
+                        button(type='submit').btn.btn-primary Create
+
+        .row
+            |
+            .col-md-12
+                .panel.panel-default
+                    .panel-heading Board List
+                    table.table.table-hover
+                        thead
+                            tr
+                                th #
+                                th title
+                                th creator
+                                th created time
+                                th updated time
+                        tbody#board-list
+
+
+    script(type='text/javascript' src='/javascripts/scripts.js')
