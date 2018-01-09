@@ -131,12 +131,9 @@ function main(host) {
 
     pageBoard(boardId) {
       const self = this;
-      get(this.host + '/api/boards/' + boardId).done(function (board) {
-        get(self.host + '/api/boards/' + boardId + '/comments').done(function (comments) {
-          let data = {'board': board};
-          data.board.comments = comments;
-          self.page(BoardComponent, data);
-        });
+      get(self.host + '/api/boards/' + boardId + '/comments').done(function (board) {
+        let data = {'board': board};
+        self.page(BoardComponent, data);
       });
     }
 
