@@ -2,15 +2,17 @@ class UserDB {
   constructor(connection) {
     this.connection = connection;
   }
-  getAll(cb) {
+
+  findAll(cb) {
     let query = "SELECT * FROM users";
     this.connection.query(query, function (error, results) {
       if (error) {
         return cb({message: error.sqlMessage});
       }
-      let users = results.forEach(function (v) {
+      let users = results.map(function (v) {
         let user = Object.assign({}, v);
         user.stamp = user.stamp.toString();
+        return user;
       });
       cb(null, users);
     });
@@ -63,7 +65,7 @@ class UserDB {
           case 'ER_DUP_ENTRY':
             self.findOneByName(username, function (err, user) {
               if (err) {
-                return cb(err, user)
+                return cb(err);
               }
               cb({message: user.name + ' already exists.'}, user);
             });
