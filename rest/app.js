@@ -5,9 +5,6 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
 const mysql = require('mysql');
-const session = require('express-session');
-const MySQLStore = require('express-mysql-session')(session);
-const flash = require('connect-flash');
 const authChecker = require('./middleware/auth');
 
 // 分割したファイルを読み込み
@@ -41,27 +38,9 @@ function main() {
     app.set('view engine', 'pug');
 
     // express setting
+    app.set('superSecret', 'secret');
+
     app.use(logger('dev'));
-    app.use(flash());
-    let sessionStore = new MySQLStore({
-      schema: {
-        tableName: 'sessions',
-        columnNames: {
-          session_id: 'session_id',
-          expires: 'expires',
-          data: 'data'
-        }
-      }
-    }, connection);
-    app.use(session({
-      secret: 'keyboard cat',
-      store: sessionStore,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        secure: false
-      }
-    }));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({extended: false}));
     app.use(cookieParser());
@@ -81,8 +60,6 @@ function main() {
       }
     });
 
-    // auth setting
-    app.set('superSecret', 'secret');
 
     // routing
     app.use('/', authChecker(connection).checkAuth([
