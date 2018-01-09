@@ -154,8 +154,8 @@ module.exports = function (connection) {
           "username": results[0].creator_name,
           "display_name": results[0].display_name
         },
-        "creator_name": results[0].creator_name,
-        "display_name": results[0].display_name
+        "created_at": results[0].created_at,
+        "updated_at": results[0].updated_at
       });
 
     });
