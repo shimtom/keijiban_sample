@@ -14,7 +14,6 @@ module.exports = function (connection) {
     })
   }
   function checkToken(token, secret, cb) {
-    console.log('Check Token');
     jwt.verify(token, secret, function (err, decoded) {
       if (err) {
         return cb({message: 'Invalid token'});
@@ -42,7 +41,6 @@ module.exports = function (connection) {
 
   function _checkAuth(whitetList) {
     function checkAuth(req, res, next) {
-      console.log('Check Auth');
       if (!whitetList) {
         whitetList = [];
       }

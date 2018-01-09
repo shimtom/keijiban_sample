@@ -7,9 +7,6 @@ RUN npm install
 
 COPY . /src
 
-ENV BASIC_AUTH_USERNAME user
-ENV BASIC_AUTH_PASSWORD password
-
 EXPOSE 3000
 
 CMD ["npm", "start"]

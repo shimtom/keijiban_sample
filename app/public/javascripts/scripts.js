@@ -147,12 +147,13 @@ function main(host) {
   }
 
   function init() {
+    let controller = new Controller(host);
     post(host + '/login').done(function () {
       controller.pageBoardList();
     }).fail(function () {
       controller.pageSign();
     });
-    return new Controller(host);
+    return controller;
   }
 
   const controller = init();
@@ -451,5 +452,5 @@ function main(host) {
 
 }
 
-let HOST = "http://127.0.0.1:3000";
+let HOST = 'http://' + location.hostname + ':3000';
 main(HOST);

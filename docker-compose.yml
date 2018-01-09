@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 services:
   db:
     build: ./db
@@ -11,7 +11,7 @@ services:
       - keijiban
     restart: always
     volumes:
-      - "./var/lib/mysql:/var/lib/mysql"
+      - './var/lib/mysql:/var/lib/mysql'
 
   rest:
     build: ./rest
@@ -39,9 +39,8 @@ services:
     depends_on:
       - db
       - rest
-    environment:
-      - BASIC_AUTH_USERNAME=user
-      - BASIC_AUTH_PASSWORD=password
+    links:
+      - rest
     networks:
       - keijiban
     ports:
