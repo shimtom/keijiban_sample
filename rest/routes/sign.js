@@ -88,24 +88,5 @@ module.exports = function (connection) {
     });
   });
 
-  // ユーザーの新規作成
-  router.post('/api/users', function (req, res, next) {
-    let username = req.body.username;
-    let display_name = req.body.display_name;
-    let password = req.body.password;
-
-    userDB.create(username, display_name, password, function (err, user) {
-      if (err || !user) {
-        let error = new Error(err.message);
-        if (user) {
-          error.status = 409;
-        }
-        return next(error);
-      }
-
-      res.json({'username': user.name, 'display_name': user.display_name});
-    });
-  });
-
   return router
 };
