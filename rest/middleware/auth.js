@@ -40,7 +40,6 @@ module.exports = function (connection) {
         return value.url === req.url && value.method === req.method;
       });
       if (white) {
-        console.log('next');
         return next();
       }
 
@@ -48,7 +47,6 @@ module.exports = function (connection) {
       if (req.headers['authorization']) {
         token = req.headers['authorization'].match(/(\S+)\s+(\S+)/)[2];
       }
-      console.log('token',token);
       checkToken(token, req.app.get('superSecret'), function (err, user) {
         if (err) {
           let error = new Error(err.message);
