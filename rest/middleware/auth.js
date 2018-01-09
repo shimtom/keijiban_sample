@@ -7,7 +7,6 @@ module.exports = function (connection) {
       if (err) {
         return cb(err);
       }
-      console.log(user);
       if (user.name !== username) {
         cb({message: 'Invalid username: ' + username});
       }

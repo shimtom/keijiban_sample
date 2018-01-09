@@ -1,20 +1,19 @@
 // 必要なパッケージの読み込み
-let express = require('express');
-let path = require('path');
-let cookieParser = require('cookie-parser');
-let bodyParser = require('body-parser');
-let logger = require('morgan');
-let mysql = require('mysql');
-let session = require('express-session');
-let MySQLStore = require('express-mysql-session')(session);
-let flash = require('connect-flash');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const logger = require('morgan');
+const mysql = require('mysql');
+const session = require('express-session');
+const MySQLStore = require('express-mysql-session')(session);
+const flash = require('connect-flash');
 const authChecker = require('./middleware/auth');
 
 // 分割したファイルを読み込み
-let users = require('./routes/users');
-let boards = require('./routes/boards');
-let sign = require('./routes/sign');
-let index = require('./routes/index');
+const users = require('./routes/users');
+const boards = require('./routes/boards');
+const sign = require('./routes/sign');
 
 let app = express();
 
@@ -75,7 +74,7 @@ function main() {
 
       // intercept OPTIONS method
       if ('OPTIONS' === req.method) {
-        res.send(200);
+        res.sendStatus(200);
       }
       else {
         next();
@@ -91,7 +90,6 @@ function main() {
       {url: '/login', method: 'POST'},
       {url: '/api/users', method: 'POST'}
     ]));
-    app.use('/', index);
     app.use('/', sign(connection));
     app.use('/api/', users(connection));
     app.use('/api/', boards(connection));

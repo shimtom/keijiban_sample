@@ -1,13 +1,12 @@
 // 必要なパッケージの読み込み
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 
 // 分割したファイルを読み込み
-var index = require('./routes/index');
-g
-var app = express();
+let index = require('./routes/index');
+let app = express();
 
 function main() {
   // view engine setup
@@ -23,7 +22,7 @@ function main() {
 
   // Not Found エラーを設定し,エラーハンドラーへ渡す.
   app.use(function (req, res, next) {
-    var err = new Error('Not Found');
+    let err = new Error('Not Found');
     err.status = 404;
     next(err);
   });

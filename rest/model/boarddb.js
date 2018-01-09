@@ -1,4 +1,4 @@
-let UserDB = require('./userdb');
+const UserDB = require('./userdb');
 
 class BoardDB {
   constructor(connection) {

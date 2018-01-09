@@ -1,5 +1,5 @@
-let BoardDB = require('./boarddb');
-let UserDB = require('./userdb');
+const BoardDB = require('./boarddb');
+const UserDB = require('./userdb');
 
 class CommentDB {
   constructor(connection) {
