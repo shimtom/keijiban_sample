@@ -2,22 +2,74 @@
 
 ## Methods
 
+
 | Method               | Type   | api                              |
 |:---------------------|:-------|:---------------------------------|
+| log in               | `POST` | `/login`                         |
+| log out              | `GET`  | `/logout`                        |
 | Get all users        | `GET`  | `/api/users`                     |
-| Register user        | `POST` | `/api/users`                     |
+| Register new user    | `POST` | `/api/users`                     |
 | Get a single user    | `GET`  | `/api/users/:username`           |
 | List users's boards  | `GET`  | `/api/users/:username/boards`    |
 | List all boards      | `GET`  | `/api/boards`                    |
-| Create a board       | `POST` | `/api/boards`                    |
+| Create new board     | `POST` | `/api/boards`                    |
 | Get a single board   | `GET`  | `/api/boards/:board_id`          |
 | Get board's comments | `GET`  | `/api/boards/:board_id/comments` |
-| Post comment         | `POST` | `/api/boards/:board_id/comments` |
+| Post a comment       | `POST` | `/api/boards/:board_id/comments` |
 
+
+### Log in
+```
+POST /login
+```
+
+#### Input
+| Input      | type     | Description |
+|:-----------|:---------|:------------|
+| `username` | `string` | ユーザー名  |
+| `password` | `string` | パスワード  |
+
+#### Example
+```json
+{
+  "username": "your username",
+  "password": "password"
+}
+```
+#### Response
+```
+Status: 200 Success
+```
+
+```json
+{
+  "username": "your username",
+  "display_name": "display name",
+  "token": "JIW token"
+}
+```
+トークンは`Authorization`ヘッダに`bearer token`の形式で付与することで,認証の必要なapiを使用することができます.
+
+### Log out
+```
+GET /logout
+```
+
+#### Response
+```
+Status: 200 Success
+```
+
+```json
+{
+  "username": "your username",
+  "display_name": "display name"
+}
+```
 
 ### Get all users
 ```
-Get /api/users
+GET /api/users
 ```
 
 #### Response
@@ -29,7 +81,7 @@ Status: 200 Success
 [
   {
     "username": "username",
-    "display_name": "display name",
+    "display_name": "display name"
   }
 ]
 ```
@@ -42,18 +94,18 @@ POST /api/users
 
 #### Input
 
-| Name          | Type     | Description                                  |
-|:--------------|:---------|:---------------------------------------------|
-| `username`    | `string` | ユーザー名                                   |
+| Name           | Type     | Description                                  |
+|:---------------|:---------|:---------------------------------------------|
+| `username`     | `string` | ユーザー名                                   |
 | `display_name` | `string` | 表示されるユーザー名                         |
-| `password`    | `string` | base64でエンコードされたユーザーのパスワード |
+| `password`     | `string` | ユーザーのパスワード                         |
 
 #### Example
 ```json
 {
   "username": "your username",
   "display_name": "display name",
-  "password": "base64 encoded password"
+  "password": "password"
 }
 ```
 
@@ -70,7 +122,6 @@ Status: 201 Created.
 ```
 
 ###  Get a single user
-ユーザーの取得
 
 ```
 GET /api/users/:username
@@ -84,7 +135,7 @@ Status: 200 Success
 ```json
 {
   "username": "username",
-  "display_name": "display name",
+  "display_name": "display name"
 }
 ```
 
@@ -104,7 +155,7 @@ Status: 200 Success
     "title": "board title",
     "creator": {
       "username": "username",
-      "display_name": "display name",
+      "display_name": "display name"
     },
     "created_at": "2011-04-10T20:09:31.000Z",
     "updated_at": "2014-03-03T18:58:10.000Z"
@@ -130,7 +181,7 @@ Status: 200 Success
     "title": "board title",
     "creator": {
       "username": "username",
-      "display_name": "display name",
+      "display_name": "display name"
     },
     "created_at": "2011-04-10T20:09:31.000Z",
     "updated_at": "2014-03-03T18:58:10.000Z"
@@ -141,13 +192,13 @@ Status: 200 Success
 
 ### Creat a board
 ```
-Post /api/boards
+POST /api/boards
 ```
 
 #### Input
-| Input | type | Description |
-|:------|:-----|:------------|
-| `title` | `string` | ボードのタイトル |
+| Input      | type     | Description              |
+|:-----------|:---------|:-------------------------|
+| `title`    | `string` | ボードのタイトル         |
 | `username` | `string` | ボード作成者のユーザー名 |
 
 #### Example
@@ -161,7 +212,6 @@ Post /api/boards
 #### Response
 ```
 Status: 201 OK
-Link: board url
 ```
 
 ```json
@@ -170,7 +220,7 @@ Link: board url
   "title": "board title",
   "creator": {
     "username": "username",
-    "display_name": "display name",
+    "display_name": "display name"
   },
   "created_at": "2011-04-10T20:09:31.000Z",
   "updated_at": "2011-04-10T20:09:31.000Z"
@@ -179,7 +229,7 @@ Link: board url
 
 ### Get a single board
 ```
-Get /api/boards/:board_id
+GET /api/boards/:board_id
 ```
 
 #### Response
@@ -193,7 +243,7 @@ Status: 200 Success
   "title": "board title",
   "creator": {
     "username": "username",
-    "display_name": "display name",
+    "display_name": "display name"
   },
   "created_at": "2011-04-10T20:09:31.000Z",
   "updated_at": "2014-03-03T18:58:10.000Z"
@@ -202,7 +252,7 @@ Status: 200 Success
 
 ### Get board's comments
 ```
-Get /api/boards/:board_id/comments
+GET /api/boards/:board_id/comments
 ```
 
 ### Response
@@ -211,25 +261,35 @@ Status: 200 Success
 ```
 
 ```json
-[
-  {
-    "id": 1,
-    "board_id": 123,
-    "content": "this is comment",
-    "created_at": "2011-04-10T20:09:31.000Z",
-    "updated_at": "2014-03-03T18:58:10.000Z",
-    "creator": {
-      "username": "username",
-      "display_name": "display name",
-    }
-  }
-]
+{
+  "id": 1234,
+  "title": "board title",
+  "creator": {
+    "username": "username",
+    "display_name": "display name"
+  },
+  "created_at": "2011-04-10T20:09:31.000Z",
+  "updated_at": "2014-03-03T18:58:10.000Z",
+  "comments": [
+      {
+        "id": 1,
+        "board_id": 1234,
+        "content": "this is comment",
+        "creator": {
+          "username": "username",
+          "display_name": "display name"
+        },
+        "created_at": "2011-04-10T20:09:31.000Z",
+        "updated_at": "2014-03-03T18:58:10.000Z"
+      }  
+  ]
+}
 ```
 
 
 ### Post comment
 ```
-Post /api/boards/:board_id/comments
+POST /api/boards/:board_id/comments
 ```
 
 #### Input
@@ -256,11 +316,11 @@ Status: 201 Created
   "id": 1,
   "board_id": 123,
   "content": "this is comment.",
-  "created_at": "2011-04-10T20:09:31.000Z",
-  "updated_at": "2011-04-10T20:09:31.000Z",
   "creator": {
     "username": "username",
-    "display_name": "display name",
-  }
+    "display_name": "display name"
+  },
+  "created_at": "2011-04-10T20:09:31.000Z",
+  "updated_at": "2011-04-10T20:09:31.000Z"
 }
 ```
